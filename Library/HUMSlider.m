@@ -19,7 +19,7 @@ static CGFloat const HUMTickOutToInDifferential = 8;
 static CGFloat const HUMImagePadding = 8;
 
 // Sizes
-static CGFloat const HUMTickHeight = 6;
+static CGFloat const HUMTickHeight = 50;
 static CGFloat const HUMTickWidth = 1;
 
 @interface HUMSlider ()
@@ -785,7 +785,7 @@ static CGFloat const HUMTickWidth = 1;
 
 - (CGFloat)tickInNotPoppedPositon
 {
-    return [self tickOutPosition] - HUMTickOutToInDifferential + HUMTickHeight / 2;
+    return [self tickOutPosition] - HUMTickOutToInDifferential + 39 + HUMTickHeight / 2;
 }
 
 - (CGFloat)tickPoppedPosition
