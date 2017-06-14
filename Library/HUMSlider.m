@@ -180,6 +180,33 @@ static CGFloat const HUMTickWidth = 1;
 
         
         // make all the spacers equal width
+//        if (i == 0 || i == self.sectionCount - 1) {
+//            CGFloat width = self.currentThumbImage.size.width / 2;
+//            [self addConstraint:[NSLayoutConstraint constraintWithItem:spacer
+//                                                             attribute:NSLayoutAttributeWidth
+//                                                             relatedBy:NSLayoutRelationEqual
+//                                                                toItem:nil
+//                                                             attribute:NSLayoutAttributeWidth
+//                                                            multiplier:1
+//                                                              constant:width]];
+//        } else if (i == self.sectionCount - 2) {
+//            [self addConstraint:[NSLayoutConstraint constraintWithItem:spacer
+//                                                             attribute:NSLayoutAttributeWidth
+//                                                             relatedBy:NSLayoutRelationEqual
+//                                                                toItem:self.spacerViews[i+1]
+//                                                             attribute:NSLayoutAttributeWidth
+//                                                            multiplier:1
+//                                                              constant:0]];
+//        } else {
+//            [self addConstraint:[NSLayoutConstraint constraintWithItem:spacer
+//                                                             attribute:NSLayoutAttributeWidth
+//                                                             relatedBy:NSLayoutRelationEqual
+//                                                                toItem:self.spacerViews[i+1]
+//                                                             attribute:NSLayoutAttributeWidth
+//                                                            multiplier:1
+//                                                              constant:0]];
+//        }
+        
         [self addConstraint:[NSLayoutConstraint constraintWithItem:spacer
                                                          attribute:NSLayoutAttributeWidth
                                                          relatedBy:NSLayoutRelationEqual
@@ -187,7 +214,6 @@ static CGFloat const HUMTickWidth = 1;
                                                          attribute:NSLayoutAttributeWidth
                                                         multiplier:1
                                                           constant:0]];
-        
         
         
         // Pin the spacer tick to the tick
@@ -238,20 +264,23 @@ static CGFloat const HUMTickWidth = 1;
     
     
     // pin the first and last spacers to the superviews.
+    NSInteger padding = self.minimumValueImage == nil ? 0 : 15;
     [self addConstraint:[NSLayoutConstraint constraintWithItem:[self.spacerViews firstObject]
                                                      attribute:NSLayoutAttributeLeft
                                                      relatedBy:NSLayoutRelationEqual
                                                         toItem:[[self.spacerViews firstObject] superview]
                                                      attribute:NSLayoutAttributeLeft
                                                     multiplier:1
-                                                      constant:15]]; // TODO actual track position
+                                                      constant:padding]]; // TODO actual track position
+    
+    padding = self.maximumValueImage == nil ? 0 : -15;
     [self addConstraint:[NSLayoutConstraint constraintWithItem:[self.spacerViews lastObject]
                                                      attribute:NSLayoutAttributeRight
                                                      relatedBy:NSLayoutRelationEqual
                                                         toItem:[[self.spacerViews lastObject] superview]
                                                      attribute:NSLayoutAttributeRight
                                                     multiplier:1
-                                                      constant:-15]]; // TODO actual track position
+                                                      constant:padding]]; // TODO actual track position
     
     // end
     
