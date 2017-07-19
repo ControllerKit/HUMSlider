@@ -161,13 +161,33 @@ static CGFloat const HUMTickWidth = 1;
     
     NSMutableArray *bottoms = [NSMutableArray array];
     
-    for (NSInteger i = 0; i < self.sectionCount; i++) {
-        
-        UIView *tick = self.tickViews[i];
-        [self pinTickWidthAndHeight:tick];
-        [bottoms addObject:[self pinBottom:tick]];
+    CGRect thumbRect = [self thumbRectForBounds:self.bounds
+                                      trackRect:[self trackRectForBounds:self.bounds]
+                                          value:self.value];
+    CGFloat thumbWidth = CGRectGetWidth(thumbRect);
+    
+    CGFloat leftImageSize = self.leftDesaturatedImageView.image.size.width + HUMTickOutToInDifferential + (thumbWidth / 2.25);
+    CGFloat rightImageSize = self.rightDesaturatedImageView.image.size.width + HUMTickOutToInDifferential + (thumbWidth / 2.25);
+    
+    for (NSInteger i = 0; i <= self.sectionCount; i++) {
         
         UIView *spacer = self.spacerViews[i];
+        
+        if (i < [self.tickViews count]) {
+            UIView *tick = self.tickViews[i];
+            [self pinTickWidthAndHeight:tick];
+            [bottoms addObject:[self pinBottom:tick]];
+            
+            // Pin the spacer tick to the tick
+            [self addConstraint:[NSLayoutConstraint constraintWithItem:spacer
+                                                             attribute:NSLayoutAttributeRight
+                                                             relatedBy:NSLayoutRelationEqual
+                                                                toItem:tick
+                                                             attribute:NSLayoutAttributeLeft
+                                                            multiplier:1
+                                                              constant:0]];
+        }
+        
         // Pin height of spacer
         [self addConstraint:[NSLayoutConstraint constraintWithItem:spacer
                                                          attribute:NSLayoutAttributeHeight
@@ -177,37 +197,43 @@ static CGFloat const HUMTickWidth = 1;
                                                         multiplier:1
                                                           constant:HUMTickHeight]];
         [self pinBottom:spacer];
-
         
-        // make all the spacers equal width
-        [self addConstraint:[NSLayoutConstraint constraintWithItem:spacer
-                                                         attribute:NSLayoutAttributeWidth
-                                                         relatedBy:NSLayoutRelationEqual
-                                                            toItem:self.spacerViews[i+1]
-                                                         attribute:NSLayoutAttributeWidth
-                                                        multiplier:1
-                                                          constant:0]];
+        if (i == 0) {
+            [spacer addConstraint:[NSLayoutConstraint constraintWithItem:spacer
+                                                               attribute:NSLayoutAttributeWidth
+                                                               relatedBy:NSLayoutRelationEqual
+                                                                  toItem:nil
+                                                               attribute:0
+                                                              multiplier:1
+                                                                constant:leftImageSize]];
+        } else if (i == self.sectionCount) {
+            [spacer addConstraint:[NSLayoutConstraint constraintWithItem:spacer
+                                                               attribute:NSLayoutAttributeWidth
+                                                               relatedBy:NSLayoutRelationEqual
+                                                                  toItem:nil
+                                                               attribute:0
+                                                              multiplier:1
+                                                                constant:rightImageSize]];
+        } else if (i < (self.sectionCount - 1)) {
+            // make all the spacers equal width
+            [self addConstraint:[NSLayoutConstraint constraintWithItem:spacer
+                                                             attribute:NSLayoutAttributeWidth
+                                                             relatedBy:NSLayoutRelationEqual
+                                                                toItem:self.spacerViews[i+1]
+                                                             attribute:NSLayoutAttributeWidth
+                                                            multiplier:1
+                                                              constant:0]];
+        }
         
-        
-        
-        // Pin the spacer tick to the tick
-        [self addConstraint:[NSLayoutConstraint constraintWithItem:spacer
-                                                                attribute:NSLayoutAttributeRight
-                                                                relatedBy:NSLayoutRelationEqual
-                                                                   toItem:tick
-                                                                attribute:NSLayoutAttributeLeft
-                                                               multiplier:1
-                                                                 constant:0]];
-        
-        if (i > 0) {
-        // Pin the spacer to the previous tick
-        [self addConstraint:[NSLayoutConstraint constraintWithItem:spacer
-                                                                 attribute:NSLayoutAttributeLeft
-                                                                 relatedBy:NSLayoutRelationEqual
-                                                                    toItem:self.tickViews[i-1]
-                                                                 attribute:NSLayoutAttributeRight
-                                                                multiplier:1
-                                                          constant:0]];
+        if (i > 0 && i < self.sectionCount) {
+            // Pin the spacer to the previous tick
+            [self addConstraint:[NSLayoutConstraint constraintWithItem:spacer
+                                                             attribute:NSLayoutAttributeLeft
+                                                             relatedBy:NSLayoutRelationEqual
+                                                                toItem:self.tickViews[i-1]
+                                                             attribute:NSLayoutAttributeRight
+                                                            multiplier:1
+                                                              constant:0]];
         }
         
     }
@@ -235,8 +261,6 @@ static CGFloat const HUMTickWidth = 1;
                                                     multiplier:1
                                                       constant:0]];
     
-    
-    
     // pin the first and last spacers to the superviews.
     [self addConstraint:[NSLayoutConstraint constraintWithItem:[self.spacerViews firstObject]
                                                      attribute:NSLayoutAttributeLeft
@@ -244,19 +268,16 @@ static CGFloat const HUMTickWidth = 1;
                                                         toItem:[[self.spacerViews firstObject] superview]
                                                      attribute:NSLayoutAttributeLeft
                                                     multiplier:1
-                                                      constant:15]]; // TODO actual track position
+                                                      constant:0]]; // TODO actual track position
     [self addConstraint:[NSLayoutConstraint constraintWithItem:[self.spacerViews lastObject]
                                                      attribute:NSLayoutAttributeRight
                                                      relatedBy:NSLayoutRelationEqual
                                                         toItem:[[self.spacerViews lastObject] superview]
                                                      attribute:NSLayoutAttributeRight
                                                     multiplier:1
-                                                      constant:-15]]; // TODO actual track position
+                                                      constant:0]]; // TODO actual track position
     
     // end
-    
-    
-   
     
     self.allTickBottomConstraints = bottoms;
     [self layoutIfNeeded];
